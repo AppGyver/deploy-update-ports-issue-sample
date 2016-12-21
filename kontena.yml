@@ -1,0 +1,12 @@
+version: '2'
+
+services:
+  loadbalancer:
+    image: kontena/lb
+    stateful: no
+    deploy:
+      strategy: daemon
+      wait_for_port: 80
+    ports:
+      - 80:80
+      - 443:443

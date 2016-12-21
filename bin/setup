@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+set -e
+
+kontena app deploy -p ""
+
+KEY="LOCALGYVER_COM_CERT_PEM"
+
+kontena service secret link loadbalancer "$KEY:RANDOM_TUUBA:env"
+kontena vault update --upsert "$KEY" "SOME RANDOM TUUBAA"
+
+kontena service update \
+  --ports 80:80 \
+  --ports 443:443 \
+  --ports 12222:12222 loadbalancer
+
+success=false
+for i in {1..10}; do
+  m="$(kontena service ls | grep loadbalancer)"
+  if [ -n "$(echo $m | grep 12222)" ]; then
+    success=true
+    echo "$m"
+    break
+  fi
+  sleep 1
+done
+
+if $success; then
+  echo "Portit päivittyi kontenaan"
+else
+  echo "$m"
+  echo "Portit eivät päivittyneet edes kontenaan, abort"
+  exit -1
+fi
+
+success=false
+for i in {1..30}; do
+  m="$(docker port null-loadbalancer-1 || :)"
+  if [ -n "$(echo "$m" | grep 12222)" ]; then
+    echo "$m"
+    success=true
+    break
+  fi
+  sleep 1
+done
+
+if $success; then
+  echo "Portit päivitty dockeriin, jee"
+  exit 0
+else
+  echo "$m"
+  echo "Portit ei päivttyneet dockeriin asti!"
+  exit -1
+fi

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+set -e
+set -v
+
+kontena app rm --force -p ""
+kontena vault rm --force LOCALGYVER_COM_CERT_PEM

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+for i in {1..5}; do
+  if bin/setup; then
+    echo "test $i -> SUCCESS"
+  else
+    echo "test $i -> FAIL"
+    # exit -1 #uncomment to break on fail
+  fi
+  for i in {1..15}; do
+    bin/destroy && break
+    sleep 1
+  done
+  sleep 5 #and giggles
+done
